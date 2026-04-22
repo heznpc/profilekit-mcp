@@ -1,0 +1,4 @@
+# ~/.codex/config.toml — MCP server registration for Codex CLI
+
+[mcp_servers.profilekit]
+command = "profilekit-mcp"

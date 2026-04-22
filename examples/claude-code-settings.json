@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "profilekit": {
+      "command": "profilekit-mcp"
+    }
+  }
+}

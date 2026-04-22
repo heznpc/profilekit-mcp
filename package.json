@@ -1,0 +1,50 @@
+{
+  "name": "@heznpc/profilekit-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for ProfileKit. Render composable GitHub profile SVG cards from Claude Code, Codex CLI, or any MCP-capable agent.",
+  "type": "module",
+  "bin": {
+    "profilekit-mcp": "dist/bin.js"
+  },
+  "files": [
+    "dist/",
+    "examples/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/bin.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "mcp",
+    "profilekit",
+    "github-profile",
+    "svg",
+    "claude-code",
+    "codex",
+    "chatgpt-apps"
+  ],
+  "author": "heznpc",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heznpc/profilekit-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/heznpc/profilekit-mcp/issues"
+  },
+  "homepage": "https://github.com/heznpc/profilekit-mcp#readme"
+}
