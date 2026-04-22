@@ -43,7 +43,7 @@ async function loadCatalog(url: string): Promise<ResolvedCatalog> {
       cards[name] = {
         description: raw.description ?? "",
         required: raw.required ?? [],
-        commonParams: raw.common_params ?? [],
+        common_params: raw.common_params ?? [],
       };
     }
     return {
