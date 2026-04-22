@@ -1,6 +1,6 @@
 {
   "name": "@heznpc/profilekit-mcp",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "MCP server for ProfileKit. Render composable GitHub profile SVG cards from Claude Code, Codex CLI, or any MCP-capable agent.",
   "type": "module",
   "bin": {
