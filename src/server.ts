@@ -4,7 +4,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { CATALOG, THEMES } from "./catalog.js";
+import { getCatalog } from "./fetch-catalog.js";
 import {
   buildCardUrl,
   buildMarkdownSnippet,
@@ -13,7 +13,7 @@ import {
 
 export async function runServer() {
   const server = new Server(
-    { name: "profilekit", version: "0.1.0" },
+    { name: "profilekit", version: "0.2.0" },
     { capabilities: { tools: {} } }
   );
 
@@ -23,7 +23,8 @@ export async function runServer() {
         name: "list_cards",
         description:
           "List every ProfileKit card type (stats, hero, snake, ...) with a one-line description and the required params for each. " +
-          "Use this before calling `render` when the user asks what cards exist or which to use.",
+          "Use this before calling `render` when the user asks what cards exist or which to use. " +
+          "Catalog is fetched live from ProfileKit on first call and cached per process.",
         inputSchema: {
           type: "object",
           properties: {},
@@ -32,7 +33,7 @@ export async function runServer() {
       {
         name: "list_themes",
         description:
-          "List the 17 built-in ProfileKit themes (dark, tokyo_night, kanagawa, rose_pine, ...). " +
+          "List built-in ProfileKit themes (dark, tokyo_night, kanagawa, rose_pine, ...). " +
           "Any card accepts `?theme=<name>`. For fully custom palettes use `?theme_url=` pointing to a JSON gist.",
         inputSchema: {
           type: "object",
@@ -76,9 +77,10 @@ export async function runServer() {
 
   server.setRequestHandler(CallToolRequestSchema, async (req) => {
     const { name, arguments: args } = req.params;
+    const catalog = await getCatalog();
 
     if (name === "list_cards") {
-      const lines = Object.entries(CATALOG)
+      const lines = Object.entries(catalog.cards)
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([type, entry]) => {
           const requiredNote = entry.required.length
@@ -86,8 +88,13 @@ export async function runServer() {
             : "";
           return `${type}: ${entry.description}${requiredNote}`;
         });
+      const footer = catalog.source === "fallback"
+        ? "\n\n(Using bundled fallback catalog — remote fetch failed.)"
+        : catalog.version
+          ? `\n\n(Catalog version: ${catalog.version}, live)`
+          : "";
       return {
-        content: [{ type: "text", text: lines.join("\n") }],
+        content: [{ type: "text", text: lines.join("\n") + footer }],
       };
     }
 
@@ -97,9 +104,9 @@ export async function runServer() {
           {
             type: "text",
             text:
-              THEMES.join(", ") +
+              catalog.themes.join(", ") +
               "\n\nUsage: append `?theme=tokyo_night` to any card URL. " +
-              "For custom palettes pass `?theme_url=<gist-raw-url>` pointing to a JSON theme (supported on /stats and /stack as of v0.1).",
+              "For custom palettes pass `?theme_url=<gist-raw-url>` pointing to a JSON theme (supported on /stats and /stack as of ProfileKit v1).",
           },
         ],
       };
@@ -112,12 +119,12 @@ export async function runServer() {
         alt?: string;
       };
       const type = input.type;
-      if (!type || !(type in CATALOG)) {
+      if (!type || !(type in catalog.cards)) {
         throw new Error(
           `Unknown card type: ${type ?? "(missing)"}. Call list_cards for available types.`
         );
       }
-      const entry = CATALOG[type];
+      const entry = catalog.cards[type];
       const params = input.params ?? {};
       const missing = entry.required.filter(
         (r) => params[r] === undefined || params[r] === null || params[r] === ""
