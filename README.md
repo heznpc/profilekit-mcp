@@ -2,8 +2,6 @@
 
 **MCP server for [ProfileKit](https://github.com/newtria/ProfileKit).** Build GitHub profile SVG cards through conversation — from Claude Code, Codex CLI, ChatGPT Apps, or any other MCP-capable agent.
 
-> ProfileKit is the human craft layer on top of AI-generated defaults. This MCP server is how you reach it from inside a coding agent.
-
 ---
 
 ## Why MCP
