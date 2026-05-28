@@ -50,6 +50,13 @@ export async function runServer() {
           type: "object",
           properties: {},
         },
+        annotations: {
+          title: "List ProfileKit card types",
+          readOnlyHint: true,
+          destructiveHint: false,
+          idempotentHint: true,
+          openWorldHint: true,
+        },
       },
       {
         name: "list_themes",
@@ -59,6 +66,13 @@ export async function runServer() {
         inputSchema: {
           type: "object",
           properties: {},
+        },
+        annotations: {
+          title: "List ProfileKit themes",
+          readOnlyHint: true,
+          destructiveHint: false,
+          idempotentHint: true,
+          openWorldHint: true,
         },
       },
       {
@@ -91,6 +105,13 @@ export async function runServer() {
             },
           },
           required: ["type"],
+        },
+        annotations: {
+          title: "Render ProfileKit card URL",
+          readOnlyHint: true,
+          destructiveHint: false,
+          idempotentHint: true,
+          openWorldHint: false,
         },
       },
     ],
