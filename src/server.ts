@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -11,9 +14,27 @@ import {
   buildHtmlSnippet,
 } from "./url.js";
 
+// Read version from package.json at runtime so it never drifts from the
+// canonical source. Works for both `dist/server.js` (npm install) and
+// `src/server.ts` (tsx dev) because in both cases the file lives exactly one
+// directory below the package root. npm always ships package.json regardless
+// of the `files` allowlist.
+function readPackageVersion(): string {
+  try {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const pkg = JSON.parse(readFileSync(join(here, "..", "package.json"), "utf8")) as {
+      version?: string;
+    };
+    return pkg.version ?? "0.0.0-dev";
+  } catch {
+    return "0.0.0-dev";
+  }
+}
+const SERVER_VERSION = readPackageVersion();
+
 export async function runServer() {
   const server = new Server(
-    { name: "profilekit", version: "0.2.0" },
+    { name: "profilekit", version: SERVER_VERSION },
     { capabilities: { tools: {} } }
   );
 
