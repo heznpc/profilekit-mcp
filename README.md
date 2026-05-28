@@ -7,11 +7,11 @@
 ## Currently implemented
 
 - **3 tools** over stdio MCP: `list_cards`, `list_themes`, `render`.
-- **28 card types** covering data (stats, pin, leetcode, …), blog layout (hero, section, timeline, …), animations (typing, snake, matrix, …), composition (`stack`), and utility (`health`).
-- **17 built-in themes** (`tokyo_night`, `kanagawa`, `rose_pine`, `dracula`, `nord`, …) — pass `?theme=<name>` to any card.
+- **Card types** covering data (stats, pin, leetcode, …), blog layout (hero, section, timeline, …), animations (typing, snake, matrix, …), composition (`stack`), and utility (`health`) — exact set returned live by `list_cards`.
+- **Built-in themes** (`tokyo_night`, `kanagawa`, `rose_pine`, `dracula`, `nord`, …) — pass `?theme=<name>` to any card; exact set returned live by `list_themes`.
 - **Dynamic catalog sync** from `https://profilekit.vercel.app/api/catalog`, cached per process; falls back to a bundled snapshot if the fetch fails.
 - **Custom palettes** via `?theme_url=<gist-raw-url>` (supported on `/stats` and `/stack` as of ProfileKit v1).
-- Published as `@heznpc/profilekit-mcp` on npm (v0.2.1).
+- Published as `@heznpc/profilekit-mcp` on npm.
 
 ## Planned
 
@@ -21,7 +21,7 @@
 ## Design intent
 
 - **URL-only, never inlines SVG.** `render` returns a URL plus markdown / HTML snippets; the SVG is fetched by the eventual `<img>` consumer (GitHub, dev.to, Notion, …). Tool responses stay small, side-effect-free, and embeddable anywhere external images are allowed.
-- **One MCP server, three agents.** After OpenAI and Anthropic co-announced [MCP Apps](https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/) in late 2025, a single stdio server covers Claude Code + Codex CLI + ChatGPT Apps natively — no per-platform adapter.
+- **One MCP server, three agents.** After OpenAI and Anthropic co-announced [MCP Apps](https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/) in early 2026, a single stdio server covers Claude Code + Codex CLI + ChatGPT Apps natively — no per-platform adapter.
 - **Live catalog over hardcoded list.** Card definitions live in ProfileKit's `/api/catalog`, so when ProfileKit ships a new card the MCP server picks it up without a republish. The bundled fallback exists only so cold/offline starts still work.
 - **No ranking, composable presentation.** Mirrors ProfileKit's stance — every card is an independent SVG that the user composes, not a leaderboard.
 
