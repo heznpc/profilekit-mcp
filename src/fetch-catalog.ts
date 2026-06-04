@@ -23,6 +23,11 @@ export function resetCatalogCache(): void {
   cachedPromise = null;
 }
 
+/** Coerce an unknown value into a string[], keeping only string elements. */
+function toStringArray(v: unknown): string[] {
+  return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
+}
+
 async function loadCatalog(url: string): Promise<ResolvedCatalog> {
   try {
     const controller = new AbortController();
@@ -30,27 +35,41 @@ async function loadCatalog(url: string): Promise<ResolvedCatalog> {
     const res = await fetch(url, { signal: controller.signal });
     clearTimeout(timer);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    // Treat the parsed body as unknown shape — a 200 response is not a promise
+    // of a well-typed catalog. Every field is validated/coerced below.
     const data = (await res.json()) as {
-      version?: string;
-      cards?: Record<string, { description: string; required?: string[]; common_params?: string[] }>;
-      themes?: string[];
+      version?: unknown;
+      cards?: unknown;
+      themes?: unknown;
     };
     if (!data.cards || typeof data.cards !== "object") {
       throw new Error("malformed catalog: missing `cards`");
     }
+    // Normalize each entry by TYPE, not just by presence. A remote catalog
+    // served with HTTP 200 can still carry wrong-typed fields (e.g. `required`
+    // as a string after an API drift). Coercing with `?? default` only guards
+    // `undefined`/`null` — a string would survive and later blow up
+    // `entry.required.filter(...)` / `.join(...)` in the tool handlers. We
+    // coerce to the expected shape and DROP only the individual entries that
+    // are not objects, so one bad entry can't discard the whole live catalog.
     const cards: Record<string, CardEntry> = {};
-    for (const [name, raw] of Object.entries(data.cards)) {
+    for (const [name, rawValue] of Object.entries(data.cards as Record<string, unknown>)) {
+      if (!rawValue || typeof rawValue !== "object") continue; // skip null/garbage entries
+      const raw = rawValue as { description?: unknown; required?: unknown; common_params?: unknown };
       cards[name] = {
-        description: raw.description ?? "",
-        required: raw.required ?? [],
-        common_params: raw.common_params ?? [],
+        description: typeof raw.description === "string" ? raw.description : "",
+        required: toStringArray(raw.required),
+        common_params: toStringArray(raw.common_params),
       };
+    }
+    if (Object.keys(cards).length === 0) {
+      throw new Error("malformed catalog: no usable card entries");
     }
     return {
       cards,
-      themes: data.themes ?? FALLBACK_THEMES,
+      themes: Array.isArray(data.themes) ? toStringArray(data.themes) : FALLBACK_THEMES,
       source: "remote",
-      version: data.version,
+      version: typeof data.version === "string" ? data.version : undefined,
     };
   } catch (err) {
     const reason = err instanceof Error ? err.message : String(err);
