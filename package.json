@@ -42,10 +42,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/heznpc/profilekit-mcp.git"
+    "url": "git+https://github.com/starter-series/profilekit-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/heznpc/profilekit-mcp/issues"
+    "url": "https://github.com/starter-series/profilekit-mcp/issues"
   },
-  "homepage": "https://github.com/heznpc/profilekit-mcp#readme"
+  "homepage": "https://github.com/starter-series/profilekit-mcp#readme"
 }

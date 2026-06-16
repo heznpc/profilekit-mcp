@@ -26,7 +26,7 @@ jobs:
       - run: node dist/bin.js help
       # OIDC trusted publishing requires the @heznpc/profilekit-mcp package
       # on npmjs.com to have a trusted publisher linked to
-      # github.com/heznpc/profilekit-mcp + this workflow file. With that
+      # github.com/starter-series/profilekit-mcp + this workflow file. With that
       # linked, npm publish auto-injects provenance attestations and
       # short-lived credentials — no NPM_TOKEN needed. If the trusted
       # publisher is not yet configured, this step fails with a clear
