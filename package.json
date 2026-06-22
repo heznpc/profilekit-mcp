@@ -26,7 +26,8 @@
     "dev": "tsx src/bin.ts",
     "test": "node --import tsx --test src/url.test.ts src/fetch-catalog.test.ts",
     "smoke:mcp": "npm run build && node scripts/mcp-smoke.mjs",
-    "prepublishOnly": "npm test && npm run build && npm run smoke:mcp"
+    "pack:check": "npm run build && node scripts/verify-pack.mjs",
+    "prepublishOnly": "npm test && npm run smoke:mcp && npm run pack:check"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0"
