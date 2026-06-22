@@ -18,6 +18,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run build
+      - run: npm audit --audit-level=high
       - run: npm test
+      - run: npm run build
+      - run: npm run smoke:mcp
       - run: node dist/bin.js help
+      - run: npm pack --dry-run --json

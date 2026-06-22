@@ -22,8 +22,12 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: npm
       - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npm test
       - run: npm run build
+      - run: npm run smoke:mcp
       - run: node dist/bin.js help
+      - run: npm pack --dry-run --json
       # OIDC trusted publishing requires the @heznpc/profilekit-mcp package
       # on npmjs.com to have a trusted publisher linked to
       # github.com/starter-series/profilekit-mcp + this workflow file. With that
