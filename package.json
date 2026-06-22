@@ -3,6 +3,14 @@
   "version": "0.2.2",
   "description": "MCP server for ProfileKit. Render composable GitHub profile SVG cards from Claude Code, Codex CLI, or any MCP-capable agent.",
   "type": "module",
+  "types": "dist/server.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    },
+    "./package.json": "./package.json"
+  },
   "bin": {
     "profilekit-mcp": "dist/bin.js"
   },
@@ -10,13 +18,15 @@
     "dist/",
     "examples/",
     "README.md",
+    "SECURITY.md",
     "LICENSE"
   ],
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/bin.ts",
     "test": "node --import tsx --test src/url.test.ts src/fetch-catalog.test.ts",
-    "prepublishOnly": "npm run build"
+    "smoke:mcp": "npm run build && node scripts/mcp-smoke.mjs",
+    "prepublishOnly": "npm test && npm run build && npm run smoke:mcp"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0"

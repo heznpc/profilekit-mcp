@@ -11,7 +11,7 @@
 - **Built-in themes** (`tokyo_night`, `kanagawa`, `rose_pine`, `dracula`, `nord`, …) — pass `?theme=<name>` to any card; exact set returned live by `list_themes`.
 - **Dynamic catalog sync** from `https://profilekit.vercel.app/api/catalog`, cached per process; falls back to a bundled snapshot if the fetch fails.
 - **Custom palettes** via `?theme_url=<gist-raw-url>` (supported on `/stats` and `/stack` as of ProfileKit v1).
-- Published as `@heznpc/profilekit-mcp` on npm.
+- Published as `@heznpc/profilekit-mcp` on npm with the `profilekit-mcp` CLI binary and a typed `runServer` export.
 
 ## Planned
 
@@ -76,6 +76,19 @@ Inside any registered agent, just ask:
 ```
 
 The agent will invoke `list_cards` / `list_themes` / `render` under the hood and hand you back a URL + markdown snippet ready to paste into your README.
+
+## Verify locally
+
+```bash
+npm ci
+npm audit --audit-level=high
+npm test
+npm run build
+npm run smoke:mcp
+npm pack --dry-run --json
+```
+
+`npm run smoke:mcp` builds the package, starts `dist/bin.js` over stdio through the MCP SDK client, lists the three tools, renders a deterministic card URL, and verifies required-param errors.
 
 ## Tools
 
