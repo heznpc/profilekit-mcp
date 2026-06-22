@@ -85,10 +85,11 @@ npm audit --audit-level=high
 npm test
 npm run build
 npm run smoke:mcp
-npm pack --dry-run --json
+npm run pack:check
 ```
 
 `npm run smoke:mcp` builds the package, starts `dist/bin.js` over stdio through the MCP SDK client, lists the three tools, renders a deterministic card URL, and verifies required-param errors.
+`npm run pack:check` runs `npm pack --dry-run --json` and verifies the exported types, server export, CLI binary, and required package files are present in the tarball.
 
 ## Tools
 
