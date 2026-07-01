@@ -67,8 +67,13 @@ for (const target of requiredTargets) {
   assert.ok(packedPaths.has(target.path), `${target.fieldName} target is missing from npm pack output: ${target.path}`);
 }
 
-for (const required of ["package.json", "README.md", "LICENSE"]) {
+for (const required of ["package.json", "README.md", "SECURITY.md", "LICENSE"]) {
   assert.ok(packedPaths.has(required), `npm pack output is missing ${required}`);
+}
+
+const allowed = /^(package\.json|README\.md|SECURITY\.md|LICENSE|dist\/|examples\/)/;
+for (const packedPath of packedPaths) {
+  assert.ok(allowed.test(packedPath), `unexpected file in npm pack output: ${packedPath}`);
 }
 
 console.log(`package surface looks good (${manifest.entryCount} packed files).`);

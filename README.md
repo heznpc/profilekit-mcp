@@ -11,7 +11,7 @@
 - **Built-in themes** (`tokyo_night`, `kanagawa`, `rose_pine`, `dracula`, `nord`, …) — pass `?theme=<name>` to any card; exact set returned live by `list_themes`.
 - **Dynamic catalog sync** from `https://profilekit.vercel.app/api/catalog`, cached per process; falls back to a bundled snapshot if the fetch fails.
 - **Custom palettes** via `?theme_url=<gist-raw-url>` (supported on `/stats` and `/stack` as of ProfileKit v1).
-- Published as `@heznpc/profilekit-mcp` on npm with the `profilekit-mcp` CLI binary and a typed `runServer` export.
+- Package identity and CLI binary are both `profilekit-mcp`; the package exports a typed `runServer` entrypoint.
 
 ## Planned
 
@@ -39,8 +39,18 @@
 
 ## Install
 
+After the unscoped npm package is published:
+
 ```bash
-npm install -g @heznpc/profilekit-mcp
+npm install -g profilekit-mcp
+```
+
+Before npm publication, run from this repository:
+
+```bash
+npm ci
+npm run build
+node dist/bin.js help
 ```
 
 ## Register with your agent
