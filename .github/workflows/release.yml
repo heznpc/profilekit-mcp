@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write  # Required for npm OIDC trusted publishing
+  id-token: write
   attestations: write
 
 jobs:
@@ -16,23 +16,37 @@ jobs:
     environment: npm-publish
     steps:
       - uses: actions/checkout@v6
+
       - uses: actions/setup-node@v6
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
           cache: npm
-      - run: npm ci
-      - run: npm audit --audit-level=high
-      - run: npm test
-      - run: npm run build
-      - run: npm run smoke:mcp
-      - run: node dist/bin.js help
-      - run: npm pack --dry-run --json
-      # OIDC trusted publishing requires the @heznpc/profilekit-mcp package
-      # on npmjs.com to have a trusted publisher linked to
-      # github.com/starter-series/profilekit-mcp + this workflow file. With that
-      # linked, npm publish auto-injects provenance attestations and
-      # short-lived credentials — no NPM_TOKEN needed. If the trusted
-      # publisher is not yet configured, this step fails with a clear
-      # message; do not fall back to a long-lived token.
-      - run: npm publish --access public
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Audit
+        run: npm audit --audit-level=high
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Smoke MCP server
+        run: npm run smoke:mcp
+
+      - name: Check CLI help
+        run: node dist/bin.js help
+
+      - name: Verify package contents
+        run: npm run pack:check
+
+      # OIDC trusted publishing requires the profilekit-mcp package on npmjs.com
+      # to have a trusted publisher linked to this repository and workflow file.
+      # With that linked, npm publish auto-injects provenance attestations and
+      # short-lived credentials; do not fall back to a long-lived token.
+      - name: Publish
+        run: npm publish

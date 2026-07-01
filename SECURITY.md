@@ -12,7 +12,7 @@ A response is sent within 7 days. A fix or mitigation plan is shared within 30 d
 ## Scope
 
 In scope:
-- This npm package `@heznpc/profilekit-mcp` (source: `src/`, build: `dist/`).
+- This npm package `profilekit-mcp` (source: `src/`, build: `dist/`).
 - Tool definitions exposed via MCP (`list_cards`, `list_themes`, `render`).
 - Catalog fetch path (`src/fetch-catalog.ts`) and URL construction (`src/url.ts`).
 
