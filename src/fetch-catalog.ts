@@ -11,16 +11,33 @@ export interface ResolvedCatalog {
 }
 
 let cachedPromise: Promise<ResolvedCatalog> | null = null;
+// After a fallback result, back off briefly before re-fetching so a
+// persistently-down remote is not hammered on every single tool call.
+let nextRetryAt = 0;
+const FALLBACK_RETRY_MS = 30_000;
 
 export function getCatalog(url: string = process.env.PROFILEKIT_CATALOG_URL ?? DEFAULT_CATALOG_URL): Promise<ResolvedCatalog> {
-  if (!cachedPromise) {
-    cachedPromise = loadCatalog(url);
+  // Only a successful remote fetch is cached permanently. A fallback result
+  // (transient network blip, timeout, or remote outage) is NOT pinned for the
+  // life of the process: clear the cache once it resolves so a later call can
+  // re-fetch and the server self-heals, subject to a short backoff.
+  if (!cachedPromise && Date.now() >= nextRetryAt) {
+    cachedPromise = loadCatalog(url).then((result) => {
+      if (result.source === "fallback") {
+        cachedPromise = null;
+        nextRetryAt = Date.now() + FALLBACK_RETRY_MS;
+      }
+      return result;
+    });
   }
-  return cachedPromise;
+  // During the backoff window (or while the in-flight promise is pending) serve
+  // the current promise if present; otherwise fall back once without caching.
+  return cachedPromise ?? loadCatalog(url);
 }
 
 export function resetCatalogCache(): void {
   cachedPromise = null;
+  nextRetryAt = 0;
 }
 
 /** Coerce an unknown value into a string[], keeping only string elements. */
