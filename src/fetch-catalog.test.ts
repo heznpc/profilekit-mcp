@@ -87,6 +87,49 @@ test("non-JSON body → bundled fallback (no throw escapes)", async () => {
   assert.equal(c.source, "fallback");
 });
 
+test("timeout covers a stalled JSON body, not only the initial fetch", async () => {
+  globalThis.fetch = (async (_url: RequestInfo | URL, init?: RequestInit) => {
+    const signal = init?.signal;
+    assert.ok(signal, "fetch should receive an AbortSignal");
+    return {
+      ok: true,
+      status: 200,
+      async json() {
+        return new Promise((_resolve, reject) => {
+          if (signal.aborted) {
+            reject(new Error("already aborted"));
+            return;
+          }
+          signal.addEventListener("abort", () => reject(new Error("aborted body")), { once: true });
+        });
+      },
+    };
+  }) as unknown as typeof fetch;
+
+  const c = await Promise.race([
+    getCatalog(URL),
+    new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error("catalog timeout did not cover body read")), 4_000);
+    }),
+  ]);
+  assert.equal(c.source, "fallback");
+});
+
+test("fallback result is reused during retry backoff", async () => {
+  let calls = 0;
+  globalThis.fetch = (async () => {
+    calls++;
+    return { ok: false, status: 500, async json() { return {}; } };
+  }) as unknown as typeof fetch;
+
+  const first = await getCatalog(URL);
+  const second = await getCatalog(URL);
+
+  assert.equal(first.source, "fallback");
+  assert.equal(second.source, "fallback");
+  assert.equal(calls, 1, "backoff window must not re-fetch immediately after fallback");
+});
+
 test("getCatalog memoizes within a process (one fetch, cached result)", async () => {
   let calls = 0;
   globalThis.fetch = (async () => {

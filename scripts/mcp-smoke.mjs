@@ -44,6 +44,22 @@ try {
   const renderTool = tools.tools.find((tool) => tool.name === "render");
   assert.equal(renderTool?.inputSchema.required?.includes("type"), true);
 
+  const cards = await client.callTool({
+    name: "list_cards",
+    arguments: {},
+  });
+  const cardsText = cards.content[0]?.type === "text" ? cards.content[0].text : "";
+  assert.match(cardsText, /stats: GitHub stats\s+\[required: username\]/);
+  assert.match(cardsText, /Catalog version: smoke, live/);
+
+  const themes = await client.callTool({
+    name: "list_themes",
+    arguments: {},
+  });
+  const themesText = themes.content[0]?.type === "text" ? themes.content[0].text : "";
+  assert.match(themesText, /dark, tokyo_night/);
+  assert.match(themesText, /theme=tokyo_night/);
+
   const rendered = await client.callTool({
     name: "render",
     arguments: {
@@ -62,6 +78,14 @@ try {
       arguments: { type: "stats", params: {} },
     }),
     /requires: username/
+  );
+
+  await assert.rejects(
+    client.callTool({
+      name: "missing_tool",
+      arguments: {},
+    }),
+    /Unknown tool: missing_tool/
   );
 } finally {
   await transport.close();

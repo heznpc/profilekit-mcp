@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 
 const root = new URL("..", import.meta.url);
@@ -74,6 +75,53 @@ for (const required of ["package.json", "README.md", "SECURITY.md", "LICENSE"]) 
 const allowed = /^(package\.json|README\.md|SECURITY\.md|LICENSE|dist\/|examples\/)/;
 for (const packedPath of packedPaths) {
   assert.ok(allowed.test(packedPath), `unexpected file in npm pack output: ${packedPath}`);
+}
+
+const tempRoot = mkdtempSync(join(tmpdir(), "profilekit-mcp-pack-"));
+try {
+  const actualPack = spawnSync("npm", ["pack", "--json", "--ignore-scripts", "--pack-destination", tempRoot], {
+    cwd: root,
+    encoding: "utf8",
+  });
+  if (actualPack.status !== 0) {
+    process.stderr.write(actualPack.stderr);
+    process.stderr.write(actualPack.stdout);
+    process.exit(actualPack.status ?? 1);
+  }
+
+  const [actualManifest] = JSON.parse(actualPack.stdout);
+  const tarball = join(tempRoot, actualManifest.filename);
+  assert.ok(existsSync(tarball), `npm pack did not create expected tarball: ${tarball}`);
+
+  const consumer = join(tempRoot, "consumer");
+  mkdirSync(consumer);
+  writeFileSync(join(consumer, "package.json"), '{"type":"module","private":true}\n');
+
+  const install = spawnSync("npm", ["install", "--offline", "--ignore-scripts", "--no-audit", "--no-fund", tarball], {
+    cwd: consumer,
+    encoding: "utf8",
+  });
+  if (install.status !== 0) {
+    process.stderr.write(install.stderr);
+    process.stderr.write(install.stdout);
+    process.exit(install.status ?? 1);
+  }
+
+  const importSmoke = spawnSync(process.execPath, [
+    "--input-type=module",
+    "-e",
+    "import { runServer } from 'profilekit-mcp'; if (typeof runServer !== 'function') throw new Error('runServer export missing');",
+  ], {
+    cwd: consumer,
+    encoding: "utf8",
+  });
+  if (importSmoke.status !== 0) {
+    process.stderr.write(importSmoke.stderr);
+    process.stderr.write(importSmoke.stdout);
+    process.exit(importSmoke.status ?? 1);
+  }
+} finally {
+  rmSync(tempRoot, { recursive: true, force: true });
 }
 
 console.log(`package surface looks good (${manifest.entryCount} packed files).`);
