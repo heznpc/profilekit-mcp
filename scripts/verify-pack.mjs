@@ -97,7 +97,7 @@ try {
   mkdirSync(consumer);
   writeFileSync(join(consumer, "package.json"), '{"type":"module","private":true}\n');
 
-  const install = spawnSync("npm", ["install", "--offline", "--ignore-scripts", "--no-audit", "--no-fund", tarball], {
+  const install = spawnSync("npm", ["install", "--ignore-scripts", "--no-audit", "--no-fund", tarball], {
     cwd: consumer,
     encoding: "utf8",
   });
