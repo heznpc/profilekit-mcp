@@ -1,6 +1,6 @@
 # profilekit-mcp
 
-**MCP server for [ProfileKit](https://github.com/starter-series/ProfileKit).** Build GitHub profile SVG cards through conversation — from Claude Code, Codex CLI, ChatGPT Apps, or any other MCP-capable agent.
+**MCP server for [ProfileKit](https://github.com/heznpc/ProfileKit).** Build GitHub profile SVG cards through conversation — from Claude Code, Codex CLI, ChatGPT Apps, or any other MCP-capable agent.
 
 ---
 

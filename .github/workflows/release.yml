@@ -46,6 +46,7 @@ jobs:
 
       # OIDC trusted publishing requires the profilekit-mcp package on npmjs.com
       # to have a trusted publisher linked to this repository and workflow file.
+      # Trusted publisher: heznpc/profilekit-mcp, release.yml, npm-publish.
       # With that linked, npm publish auto-injects provenance attestations and
       # short-lived credentials; do not fall back to a long-lived token.
       - name: Publish

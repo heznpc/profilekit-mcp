@@ -5,9 +5,9 @@
 Please **do not** open public GitHub issues for vulnerabilities in this package.
 
 Preferred channel — **GitHub private vulnerability reporting**:
-[Report a vulnerability](https://github.com/starter-series/profilekit-mcp/security/advisories/new)
+[Report a vulnerability](https://github.com/heznpc/profilekit-mcp/security/advisories/new)
 
-A response is sent within 7 days. A fix or mitigation plan is shared within 30 days of confirmation. If the issue is also present in the upstream [ProfileKit API](https://github.com/starter-series/ProfileKit) (this package is a thin MCP wrapper around it), the report is forwarded with credit preserved.
+A response is sent within 7 days. A fix or mitigation plan is shared within 30 days of confirmation. If the issue is also present in the upstream [ProfileKit API](https://github.com/heznpc/ProfileKit) (this package is a thin MCP wrapper around it), the report is forwarded with credit preserved.
 
 ## Scope
 
